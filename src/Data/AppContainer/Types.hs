@@ -37,7 +37,7 @@ data ImageManifest = ImageManifest
     , imVersion :: !Version
     , imLabels :: ![Label]
     , imApp :: !(Maybe App)
-    , imDependencies :: [Dependency]
+    , imDependencies :: ![Dependency]
 
     -- , crmAnnotations
     } deriving (Show, Eq)
