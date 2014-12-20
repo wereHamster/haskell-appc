@@ -18,6 +18,7 @@ import           Data.Text (Text)
 import qualified Data.Text as T
 
 import           Data.Map (Map)
+import qualified Data.Map as M
 
 import           Data.SemVer
 import           Data.UUID
@@ -51,11 +52,9 @@ instance FromJSON ImageManifest where
         acKind <- o .: "acKind"
         guard $ acKind == imageManifestKind
 
-        versionString <- o .: "acVersion"
-
         ImageManifest
             <$> o .: "name"
-            <*> parseVersion versionString
+            <*> (o .: "acVersion" >>= parseVersion)
             <*> o .:? "labels" .!= []
             <*> o .:? "app"
             <*> o .:? "dependencies" .!= []
@@ -95,11 +94,9 @@ instance FromJSON ContainerRuntimeManifest where
         acKind <- o .: "acKind"
         guard $ acKind == containerRuntimeManifestKind
 
-        versionString <- o .: "acVersion"
-
         ContainerRuntimeManifest
             <$> o .: "uuid"
-            <*> parseVersion versionString
+            <*> (o .: "acVersion" >>= parseVersion)
             <*> o .: "apps"
             <*> o .:? "volumes" .!= []
 
@@ -131,11 +128,23 @@ data App = App
     { appExec :: ![Text]
     , appUser :: !Text
     , appGroup :: !Text
-    , appEventHandlers :: !(Maybe [EventHandler])
-    , appEnvironment :: !(Maybe (Map Text Text))
-    , appMountPoints :: !(Maybe [MountPoint])
-    , appPorts :: !(Maybe [Port])
+    , appEventHandlers :: ![EventHandler]
+    , appEnvironment :: !(Map Text Text)
+    , appMountPoints :: ![MountPoint]
+    , appPorts :: ![Port]
     } deriving (Show, Eq)
+
+instance FromJSON App where
+    parseJSON (Object o) = App
+        <$> o .: "exec"
+        <*> o .: "user"
+        <*> o .: "group"
+        <*> o .:? "eventHandlers" .!= []
+        <*> o .:? "environment" .!= M.empty
+        <*> o .:? "mountPoints" .!= []
+        <*> o .:? "ports" .!= []
+
+    parseJSON _ = fail "App"
 
 data EventHandler = EventHandler
     { ehName :: !Text
@@ -156,8 +165,17 @@ data Port = Port
     { portName :: !Text
     , portProtocol :: !Text
     , portPort :: !Int
-    , portSocketActivated :: !(Maybe Bool)
+    , portSocketActivated :: !Bool
     } deriving (Show, Eq)
+
+instance FromJSON Port where
+    parseJSON (Object o) = Port
+        <$> o .: "name"
+        <*> o .: "protocol"
+        <*> o .: "port"
+        <*> o .:? "socketActivated" .!= False
+
+    parseJSON _ = fail "Port"
 
 data Dependency = Dependency
     { depName :: !Text
@@ -182,11 +200,11 @@ instance FromJSON UUID where
         Just uuid -> pure uuid
 
 
-$(deriveJSON (deriveJSONOptions "app") ''App)
+$(deriveToJSON (deriveJSONOptions "app") ''App)
 $(deriveJSON (deriveJSONOptions "dep") ''Dependency)
 $(deriveJSON (deriveJSONOptions "eh") ''EventHandler)
 $(deriveJSON (deriveJSONOptions "label") ''Label)
 $(deriveJSON (deriveJSONOptions "mp") ''MountPoint)
 $(deriveJSON (deriveJSONOptions "vol") ''Volume)
-$(deriveJSON (deriveJSONOptions "port") ''Port)
+$(deriveToJSON (deriveJSONOptions "port") ''Port)
 $(deriveJSON (deriveJSONOptions "image") ''Image)

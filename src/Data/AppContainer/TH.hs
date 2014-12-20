@@ -1,5 +1,6 @@
 module Data.AppContainer.TH
   ( deriveJSON
+  , deriveToJSON
   , deriveJSONOptions
   , FromJSON(..)
   , ToJSON(..)
