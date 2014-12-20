@@ -32,7 +32,7 @@ executable appc
     main-is:             Main.hs
 
     build-depends:
-        base >=4.7 && <4.8,
+        base >=4.6 && <4.8,
         aeson,
         bytestring,
         containers,
@@ -52,7 +52,7 @@ test-suite spec
     type:                exitcode-stdio-1.0
 
     build-depends:
-        base < 4.8,
+        base >=4.6 && <4.8,
         hspec,
         smallcheck,
         hspec-smallcheck,
