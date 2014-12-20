@@ -5,6 +5,8 @@
 module Data.AppContainer.Types
    ( ImageManifest(..)
    , ContainerRuntimeManifest(..)
+   , Image(..)
+   , App(..)
    ) where
 
 
