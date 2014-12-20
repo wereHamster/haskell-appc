@@ -7,6 +7,7 @@ module Data.AppContainer.Types
    , ContainerRuntimeManifest(..)
    , Image(..)
    , App(..)
+   , Label(..)
    ) where
 
 
@@ -38,7 +39,7 @@ data ImageManifest = ImageManifest
     , imDependencies :: [Dependency]
 
     -- , crmAnnotations
-    }
+    } deriving (Show, Eq)
 
 imageManifestKind :: Text
 imageManifestKind = "ImageManifest"
@@ -56,7 +57,7 @@ instance FromJSON ImageManifest where
             <$> o .: "name"
             <*> parseVersion versionString
             <*> o .:? "labels" .!= []
-            <*> o .: "app"
+            <*> o .:? "app"
             <*> o .:? "dependencies" .!= []
 
     parseJSON _ = fail "ImageManifest"
@@ -116,7 +117,7 @@ instance ToJSON ContainerRuntimeManifest where
 data Label = Label
     { labelName :: !Text
     , labelVal :: !Text
-    }
+    } deriving (Show, Eq)
 
 data Image = Image
     { imageApp :: !Text
@@ -124,7 +125,7 @@ data Image = Image
 
     -- , imageIsolators
     -- , imageAnnotations
-    }
+    } deriving (Show, Eq)
 
 data App = App
     { appExec :: ![Text]
@@ -134,36 +135,36 @@ data App = App
     , appEnvironment :: !(Maybe (Map Text Text))
     , appMountPoints :: !(Maybe [MountPoint])
     , appPorts :: !(Maybe [Port])
-    }
+    } deriving (Show, Eq)
 
 data EventHandler = EventHandler
     { ehName :: !Text
     , ehExec :: ![Text]
-    }
+    } deriving (Show, Eq)
 
 data MountPoint = MountPoint
     { mpName :: !Text
     , mpPath :: !Text
     , mpReadOnly :: !Bool
-    }
+    } deriving (Show, Eq)
 
 data Volume = Volume
     { volKind :: !Text
-    }
+    } deriving (Show, Eq)
 
 data Port = Port
     { portName :: !Text
     , portProtocol :: !Text
     , portPort :: !Int
     , portSocketActivated :: !(Maybe Bool)
-    }
+    } deriving (Show, Eq)
 
 data Dependency = Dependency
     { depName :: !Text
     , depLabels :: ![Label]
     , depHash :: !Text
     , depRoot :: !Text
-    }
+    } deriving (Show, Eq)
 
 
 parseVersion :: Text -> Parser Version
