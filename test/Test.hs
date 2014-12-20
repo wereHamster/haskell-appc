@@ -21,9 +21,22 @@ import           Data.Aeson
 import           Data.Text (Text)
 import           Data.Text as T
 import           Data.SemVer
+import           Data.UUID
+
+import           GHC.Word
 
 import           Data.AppContainer.Types
 
+
+instance Monad m => Serial m Word32 where
+    series = decDepth $ fromIntegral <$> (series :: Series m Int)
+
+instance Monad m => Serial m UUID where
+    series = decDepth $ fromWords
+        <$> series
+        <*> series
+        <*> series
+        <*> series
 
 instance Monad m => Serial m Text where
     series = decDepth $ T.pack
@@ -45,6 +58,13 @@ instance Monad m => Serial m ImageManifest where
     series = decDepth $ ImageManifest
         <$> series <*> series <*> series <*> pure Nothing <*> pure []
 
+instance Monad m => Serial m ContainerRuntimeManifest where
+    series = decDepth $ ContainerRuntimeManifest
+        <$> series
+        <*> series
+        <*> pure []
+        <*> pure []
+
 
 
 main :: IO ()
@@ -57,4 +77,9 @@ spec = do
 
     describe "ImageManifest" $ do
         it "x ≡ fromJSON (toJSON x)" $ property $ \(im :: ImageManifest) ->
+            Success im == fromJSON (toJSON im)
+
+
+    describe "ContainerRuntimeManifest" $ do
+        it "x ≡ fromJSON (toJSON x)" $ property $ \(im :: ContainerRuntimeManifest) ->
             Success im == fromJSON (toJSON im)

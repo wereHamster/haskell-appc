@@ -59,4 +59,5 @@ test-suite spec
         appc,
         text,
         semver,
+        uuid,
         aeson

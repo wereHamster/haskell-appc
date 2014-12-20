@@ -84,7 +84,7 @@ data ContainerRuntimeManifest = ContainerRuntimeManifest
 
     -- , crmIsolators
     -- , crmAnnotations
-    }
+    } deriving (Show, Eq)
 
 containerRuntimeManifestKind :: Text
 containerRuntimeManifestKind = "ContainerRuntimeManifest"
