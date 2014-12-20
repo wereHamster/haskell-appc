@@ -55,9 +55,9 @@ instance FromJSON ImageManifest where
         ImageManifest
             <$> o .: "name"
             <*> parseVersion versionString
-            <*> o .: "labels"
+            <*> o .:? "labels" .!= []
             <*> o .: "app"
-            <*> o .: "dependencies"
+            <*> o .:? "dependencies" .!= []
 
     parseJSON _ = fail "ImageManifest"
 
@@ -100,7 +100,7 @@ instance FromJSON ContainerRuntimeManifest where
             <$> o .: "uuid"
             <*> parseVersion versionString
             <*> o .: "apps"
-            <*> o .: "volumes"
+            <*> o .:? "volumes" .!= []
 
     parseJSON _ = fail "ContainerRuntimeManifest"
 
@@ -130,10 +130,10 @@ data App = App
     { appExec :: ![Text]
     , appUser :: !Text
     , appGroup :: !Text
-    , appEventHandlers :: ![EventHandler]
-    , appEnvironment :: !(Map Text Text)
-    , appMountPoints :: ![MountPoint]
-    , appPorts :: ![Port]
+    , appEventHandlers :: !(Maybe [EventHandler])
+    , appEnvironment :: !(Maybe (Map Text Text))
+    , appMountPoints :: !(Maybe [MountPoint])
+    , appPorts :: !(Maybe [Port])
     }
 
 data EventHandler = EventHandler
@@ -155,7 +155,7 @@ data Port = Port
     { portName :: !Text
     , portProtocol :: !Text
     , portPort :: !Int
-    , portSocketActivated :: !Bool
+    , portSocketActivated :: !(Maybe Bool)
     }
 
 data Dependency = Dependency
