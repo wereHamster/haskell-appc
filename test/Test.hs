@@ -55,10 +55,6 @@ main = do
 spec :: Spec
 spec = do
 
-    -- The roundtrips test whether the driver generates the proper terms
-    -- and the server responds with what the driver expects.
     describe "ImageManifest" $ do
         it "x ≡ fromJSON (toJSON x)" $ property $ \(im :: ImageManifest) ->
-            monadic $ do
-                res <- return $ fromJSON $ toJSON im
-                return $ res == Success im
+            Success im == fromJSON (toJSON im)
