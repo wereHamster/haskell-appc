@@ -23,6 +23,7 @@ library
     build-depends:
         base >=4.6 && <4.8,
         aeson,
+        bytestring,
         containers,
         semver,
         uuid,

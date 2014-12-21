@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -fno-warn-orphans #-}
+
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
 {-# LANGUAGE RecordWildCards   #-}
@@ -5,9 +7,16 @@
 module Data.AppContainer.Types
    ( ImageManifest(..)
    , ContainerRuntimeManifest(..)
-   , Image(..)
+
    , App(..)
+   , Dependency(..)
+   , EventHandler(..)
+   , Image(..)
    , Label(..)
+   , MountPoint(..)
+   , Port(..)
+   , Volume(..)
+
    ) where
 
 
@@ -15,7 +24,6 @@ import           Control.Applicative
 import           Control.Monad
 
 import           Data.Text (Text)
-import qualified Data.Text as T
 
 import           Data.Map (Map)
 import qualified Data.Map as M
