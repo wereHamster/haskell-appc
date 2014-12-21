@@ -17,6 +17,7 @@ library
     hs-source-dirs:      src
 
     exposed-modules:
+        Data.AppContainer,
         Data.AppContainer.Types
 
     build-depends:
