@@ -18,6 +18,7 @@ library
 
     exposed-modules:
         Data.AppContainer,
+        Data.AppContainer.TH
         Data.AppContainer.Types
 
     build-depends:
