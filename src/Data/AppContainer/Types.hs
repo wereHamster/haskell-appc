@@ -168,6 +168,14 @@ data MountPoint = MountPoint
     , mpReadOnly :: !Bool
     } deriving (Show, Eq)
 
+instance FromJSON MountPoint where
+    parseJSON (Object o) = MountPoint
+        <$> o .: "name"
+        <*> o .: "path"
+        <*> o .:? "readOnly" .!= False
+
+    parseJSON _ = fail "MountPoint"
+
 data Volume = Volume
     { volFulfills :: ![Text]
     , volSource :: !VolumeSource
@@ -267,6 +275,6 @@ $(deriveToJSON (deriveJSONOptions "app") ''App)
 $(deriveJSON (deriveJSONOptions "dep") ''Dependency)
 $(deriveJSON (deriveJSONOptions "eh") ''EventHandler)
 $(deriveJSON (deriveJSONOptions "label") ''Label)
-$(deriveJSON (deriveJSONOptions "mp") ''MountPoint)
+$(deriveToJSON (deriveJSONOptions "mp") ''MountPoint)
 $(deriveToJSON (deriveJSONOptions "port") ''Port)
 $(deriveJSON (deriveJSONOptions "image") ''Image)
