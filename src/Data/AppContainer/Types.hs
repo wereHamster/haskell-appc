@@ -16,6 +16,8 @@ module Data.AppContainer.Types
    , MountPoint(..)
    , Port(..)
    , Volume(..)
+   , VolumeSource(..)
+   , HostVolume(..)
 
    ) where
 
@@ -30,6 +32,7 @@ import qualified Data.Map as M
 
 import           Data.SemVer
 import           Data.UUID
+import           Data.Monoid
 
 import           Data.Aeson
 import           Data.Aeson.Types
@@ -166,8 +169,60 @@ data MountPoint = MountPoint
     } deriving (Show, Eq)
 
 data Volume = Volume
-    { volKind :: !Text
+    { volFulfills :: ![Text]
+    , volSource :: !VolumeSource
     } deriving (Show, Eq)
+
+instance FromJSON Volume where
+    parseJSON v@(Object o) = Volume
+        <$> o .: "fulfills"
+        <*> parseJSON v
+
+    parseJSON _ = fail "Volume"
+
+instance ToJSON Volume where
+    toJSON Volume{..} = case volSource of
+        EmptyVolumeSource -> object
+            [ "kind"     .= ("empty" :: Text)
+            , "fulfills" .= volFulfills
+            ]
+
+        HostVolumeSource HostVolume{..} -> object
+            [ "kind"     .= ("host" :: Text)
+            , "fulfills" .= volFulfills
+            , "source"   .= hvSource
+            , "readOnly" .= hvReadOnly
+            ]
+
+
+data VolumeSource
+    = EmptyVolumeSource
+    | HostVolumeSource HostVolume
+    deriving (Show, Eq)
+
+instance FromJSON VolumeSource where
+    parseJSON v@(Object o) = do
+        kind <- o .: "kind"
+        case kind :: String of
+            "empty" -> return EmptyVolumeSource
+            "host"  -> HostVolumeSource <$> parseJSON v
+            _       -> fail $ "Unknown volume kind: " <> kind
+
+    parseJSON _ = fail "VolumeSource"
+
+
+data HostVolume = HostVolume
+    { hvSource :: !Text
+    , hvReadOnly :: !Bool
+    } deriving (Show, Eq)
+
+instance FromJSON HostVolume where
+    parseJSON (Object o) = HostVolume
+        <$> o .: "source"
+        <*> o .:? "readOnly" .!= False
+
+    parseJSON _ = fail "HostVolume"
+
 
 data Port = Port
     { portName :: !Text
@@ -213,6 +268,5 @@ $(deriveJSON (deriveJSONOptions "dep") ''Dependency)
 $(deriveJSON (deriveJSONOptions "eh") ''EventHandler)
 $(deriveJSON (deriveJSONOptions "label") ''Label)
 $(deriveJSON (deriveJSONOptions "mp") ''MountPoint)
-$(deriveJSON (deriveJSONOptions "vol") ''Volume)
 $(deriveToJSON (deriveJSONOptions "port") ''Port)
 $(deriveJSON (deriveJSONOptions "image") ''Image)
