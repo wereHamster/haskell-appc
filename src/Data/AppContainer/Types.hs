@@ -79,6 +79,7 @@ instance ToJSON ImageManifest where
         , "name"         .= imName
         , "labels"       .= imLabels
         , "dependencies" .= imDependencies
+        , "app"          .= imApp
         ]
 
 
