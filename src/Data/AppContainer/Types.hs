@@ -144,6 +144,7 @@ data App = App
     , appEnvironment :: !(Map Text Text)
     , appMountPoints :: ![MountPoint]
     , appPorts :: ![Port]
+    , appWorkingDirectory :: !Text
     } deriving (Show, Eq)
 
 instance FromJSON App where
@@ -155,6 +156,7 @@ instance FromJSON App where
         <*> o .:? "environment" .!= M.empty
         <*> o .:? "mountPoints" .!= []
         <*> o .:? "ports" .!= []
+        <*> o .:? "workingDirectory" .!= "/"
 
     parseJSON _ = fail "App"
 
